@@ -9,6 +9,7 @@ import {
 export const ClientActionName = GatewayClientActionName
 
 const ACTION_CAPABILITIES = Object.freeze({
+  [ClientActionName.CLASSROOM]: GatewayClientCapability.CLIENT_ACTION_CLASSROOM,
   [ClientActionName.ENTER_SLEEP]: GatewayClientCapability.CLIENT_ACTION_ENTER_SLEEP,
 })
 

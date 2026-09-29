@@ -3,6 +3,7 @@ import {
   GATEWAY_CLIENT_IMPLEMENTED_CAPABILITIES,
   GATEWAY_CLIENT_PROTOCOL_VERSION,
   GatewayClientProtocolEvent,
+  GatewayClientCapability,
   GatewaySessionHelloSchema,
   gatewayClientProtocolCapabilityFor,
   gatewayHelloAsLegacyConnect,
@@ -76,7 +77,7 @@ export class GatewayClientProtocolSession {
 
     if (isGatewayClientRuntimeMessage(value?.type)) {
       const requiredCapability = gatewayClientProtocolCapabilityFor(value.type)
-      if (!this.capabilities.includes(requiredCapability)) {
+      if (!this.capabilities.includes(requiredCapability) && !(value.type === GatewayClientProtocolEvent.CLIENT_ACTION_RESULT && this.capabilities.includes(GatewayClientCapability.CLIENT_ACTION_CLASSROOM))) {
         return this.#error(
           'capability_not_negotiated',
           `${requiredCapability} was not negotiated`,

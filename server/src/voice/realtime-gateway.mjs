@@ -1,3 +1,4 @@
+import { classroomTools } from './tools/classroom-tools.mjs'
 import { WebSocket, WebSocketServer } from 'ws'
 import { selectGatewayWebSocketProtocol } from '../../../shared/gateway-websocket-auth.mjs'
 import { randomUUID } from 'node:crypto'
@@ -308,6 +309,7 @@ export function attachRealtimeGateway(server, {
       send: event => send(ws, event),
       getCapabilities: () => [...clientActionCapabilities],
     })
+    const sessionToolSources = [...frontendToolSources, classroomTools(clientActions, { taskManager, backendRuntime, getContext: () => ({ ownerId, sessionId, turnId: turns.committedTurnId }) })]
     const presenceController = new PresenceController({
       clientActions,
       beforeSleep: async () => {
@@ -377,7 +379,7 @@ export function attachRealtimeGateway(server, {
           // 它每场都在变，会让 prompt 前缀每场都变。
           ...(sessionDigests ? [FRONTEND_RECALL_CAPABILITY] : []),
         ])],
-        tools: frontendSourceToolDefinitions(frontendToolSources),
+        tools: frontendSourceToolDefinitions(sessionToolSources),
       },
       memories: memoryService?.list(ownerId, { limit: 64 }) || [],
       recentMessages: frontendRecentMessages(),
@@ -775,7 +777,7 @@ export function attachRealtimeGateway(server, {
       inputAssets,
       frontendRetrieval,
       frontendKnowledge,
-      frontendToolSources,
+      frontendToolSources: sessionToolSources,
       turnCitations,
       sessionDigests,
     })
@@ -1528,6 +1530,7 @@ export function attachRealtimeGateway(server, {
           && event.clientStates.includes('sleeping')
         ) ? ['sleeping'] : []
         clientActionCapabilities.clear()
+        if (clientProtocol.capabilities.includes(GatewayClientCapability.CLIENT_ACTION_CLASSROOM)) clientActionCapabilities.add(GatewayClientCapability.CLIENT_ACTION_CLASSROOM)
         if (
           clientProtocol.capabilities.includes(
             GatewayClientCapability.CLIENT_ACTION_ENTER_SLEEP,
@@ -1702,6 +1705,7 @@ export function attachRealtimeGateway(server, {
     })
 
     ws.on('close', () => {
+      clientActions.close()
       activeClientLeases.release(
         ownerId,
         leaseParticipant,

@@ -186,46 +186,7 @@ const unsubscribeSessionTaskJournal = taskManager.subscribe(event => {
     },
   })
 }, { scope: 'all' })
-// Classroom page turns are a narrow foreground tool. The WebUI applies the
-// requested page locally after receiving the factual tool-call debug event;
-// the Gateway still returns a normal tool result so the realtime model can
-// continue its lecture turn.
-const classroomFrontendToolSource = {
-  describe: () => ({ key: 'classroom', label: 'EduNexus AI Classroom' }),
-  initialize: () => Promise.resolve(),
-  tools: () => [{
-    name: 'classroom.navigate',
-    definition: {
-      type: 'function',
-      function: {
-        name: 'classroom.navigate',
-        description: '在 EduNexus AI 课堂中翻到指定页。只有讲完当前页并且讲稿给出 PAGE_TURN 时才调用；不要直接声称已经翻页。',
-        parameters: {
-          type: 'object',
-          properties: {
-            page: { type: 'integer', minimum: 1, maximum: 240, description: '要显示的课件页码。' },
-          },
-          required: ['page'],
-          additionalProperties: false,
-        },
-      },
-    },
-    policy: { mode: 'inline', maxCallsPerTurn: 8, maxResultBytes: 1_024 },
-  }],
-  execute: async (name, args = {}) => {
-    if (name !== 'classroom.navigate') throw new Error('未知课堂工具');
-    const page = Number(args?.page);
-    if (!Number.isInteger(page) || page < 1 || page > 240) {
-      return { status: 'rejected', message: '页码必须是 1 到 240 之间的整数。' };
-    }
-    return { status: 'requested', page, instruction: `已请求显示第 ${page} 页；请继续使用 PAGE ${page} 的摘要讲解，必要时再从 workspace 读取详情。` };
-  },
-  health: () => ({ status: 'ready' }),
-  close: () => Promise.resolve(),
-}
-
 const frontendToolSources = [
-  classroomFrontendToolSource,
   frontendMcpRuntime,
   frontendOpenApiRuntime,
 ].filter(Boolean).map(source => assertFrontendToolSource(source))

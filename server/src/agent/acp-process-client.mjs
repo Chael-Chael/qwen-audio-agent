@@ -347,6 +347,13 @@ export class AcpProcessClient {
     applySessionMetadataUpdate(this.sessions.get(sessionId), update)
     const active = this.activePrompts.get(sessionId)
     const text = textFromUpdate(update)
+    const session = this.sessions.get(sessionId)
+    const startupInfo = session?.response?._meta?.piAcp?.startupInfo
+    // Pi ACP sends its declared startup inventory as an agent message; it is not a task answer.
+    if (startupInfo && text === startupInfo && !session.startupInfoConsumed) {
+      session.startupInfoConsumed = true
+      return
+    }
     if (active && text) active.text.push(text)
     const contentBlock = contentBlockFromUpdate(update)
     if (active && contentBlock) active.contentBlocks.push(contentBlock)

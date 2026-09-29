@@ -29,6 +29,11 @@ test('projects only operating-system and selected backend environment', () => {
 })
 
 test('keeps each backend credential namespace isolated', () => {
+  const pi = backendEnvironment('pi', { env: { ...env, BAILIAN_API_KEY: 'bailian-test', PI_CODING_AGENT_DIR: '/classroom/pi' } })
+  assert.equal(pi.DASHSCOPE_API_KEY, 'dashscope-secret')
+  assert.equal(pi.BAILIAN_API_KEY, 'bailian-test')
+  assert.equal(pi.PI_CODING_AGENT_DIR, '/classroom/pi')
+  assert.equal(pi.QWEN_AUDIO_AGENT_AUTH_SECRET, undefined)
   assert.equal(
     backendEnvironment('claude', { env }).ANTHROPIC_API_KEY,
     'anthropic-secret',

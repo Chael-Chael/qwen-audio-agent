@@ -5,6 +5,17 @@ import test from 'node:test'
 import { AcpProcessClient } from '../src/agent/acp-process-client.mjs'
 import { openClawBackendDriver } from '../src/agent/backends/openclaw.mjs'
 
+test('excludes the declared Pi startup inventory from task output', () => {
+  const client = new AcpProcessClient({ label: 'Pi', command: 'unused' })
+  client.rememberSession('pi', { response: { _meta: { piAcp: { startupInfo: '## Skills\nInventory' } } } })
+  const active = { text: [], contentBlocks: [] }
+  client.activePrompts.set('pi', active)
+  client.handleUpdate({ sessionId: 'pi', update: { sessionUpdate: 'agent_message_chunk', content: { type: 'text', text: '## Skills\nInventory' } } })
+  client.handleUpdate({ sessionId: 'pi', update: { sessionUpdate: 'agent_message_chunk', content: { type: 'text', text: '{"body":"# 笔记"}' } } })
+  assert.deepEqual(active.text, ['{"body":"# 笔记"}'])
+  assert.equal(active.contentBlocks.length, 1)
+})
+
 test('keeps session object identity stable across re-registration', () => {
   const client = new AcpProcessClient({
     label: 'Test Agent',

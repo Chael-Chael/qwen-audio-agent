@@ -56,12 +56,14 @@ export const GatewayClientCapability = Object.freeze({
   CONVERSATION_HISTORY: 'conversation.history',
   CLIENT_EVENTS: 'client.events',
   SESSION_OUTPUT_VOICE: 'session.output_voice',
+  CLIENT_ACTION_CLASSROOM: 'client.actions.classroom.tool',
   CLIENT_ACTION_ENTER_SLEEP: 'client.actions.desktop.presence.enter_sleep',
   SESSION_REPLAY: 'session.replay',
   SESSION_TAKEOVER: 'session.takeover',
 })
 
 export const GatewayClientActionName = Object.freeze({
+  CLASSROOM: 'classroom.tool',
   ENTER_SLEEP: 'desktop.presence.enter_sleep',
 })
 
@@ -86,6 +88,7 @@ export const GATEWAY_CLIENT_IMPLEMENTED_CAPABILITIES = Object.freeze([
   GatewayClientCapability.CLIENT_EVENTS,
   GatewayClientCapability.SESSION_OUTPUT_VOICE,
   GatewayClientCapability.CLIENT_ACTION_ENTER_SLEEP,
+  GatewayClientCapability.CLIENT_ACTION_CLASSROOM,
   GatewayClientCapability.SESSION_REPLAY,
   GatewayClientCapability.SESSION_TAKEOVER,
 ])

@@ -357,6 +357,8 @@ const definitions = new Map([
     alwaysFullPermission: true,
     environment: {
       names: [
+        'DASHSCOPE_API_KEY',
+        'BAILIAN_API_KEY',
         'ANTHROPIC_API_KEY',
         'ANTHROPIC_BASE_URL',
         'OPENAI_API_KEY',
